@@ -1,0 +1,32 @@
+[
+    {
+        "name": "employee_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "name",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "department",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "salary",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "hire_date",
+        "type": "DATE",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "location",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    }
+]
