@@ -1,0 +1,146 @@
+CREATE TABLE public.Transformtable
+(
+    Name VARCHAR(255),
+    ID INTEGER
+);
+
+
+CREATE TABLE public.CTE
+(
+    gameId VARCHAR(255),
+	homeTeamName VARCHAR(255),
+	awayTeamName VARCHAR(255),
+	attendance INTEGER
+);
+
+
+CREATE TABLE public.CTETABLE
+(
+    scene_id VARCHAR(255),
+	product_id VARCHAR(255),
+	sensing_time TIMESTAMP,
+	cloud_cover FLOAT,
+	total_size INTEGER
+);
+======================================================================================================================================================================
+
+import apache_beam as beam
+-------------------------------------------------
+Apache Beam provides a simple, powerful programming model for building both batch and streaming parallel data processing pipelines.
+
+The Apache Beam SDK for Python provides access to Apache Beam capabilities from the Python programming language.
+
+
+PCollection: represents a collection of data, which could be bounded or unbounded in size.
+PTransform: represents a computation that transforms input PCollections into output PCollections.
+Pipeline: manages a directed acyclic graph of PTransform s and PCollection s that is ready for execution.
+PipelineRunner: specifies where and how the pipeline should execute.
+Read: read from an external source.
+Write: write to an external data sink.
+
+
+with beam.Pipeline() as pipeline -> Creating a Pipeline
+----------------------------------------------------
+from apache_beam.options.pipeline_options import PipelineOptions, StandardOptions
+
+The PipelineOptions and StandardOptions classes in Apache Beam are used to configure and manage pipeline execution.
+
+PipelineOptions
+---------------------------------------------
+PipelineOptions is a base class for defining custom options for your pipeline. It allows you to specify various configuration parameters that your pipeline can use during execution.
+
+
+The PipelineOptions and StandardOptions classes in Apache Beam are used to configure and manage pipeline execution. Here's a brief overview of what they are and how you might use them:
+
+PipelineOptions
+PipelineOptions is a base class for defining custom options for your pipeline. It allows you to specify various configuration parameters that your pipeline can use during execution.
+
+StandardOptions
+StandardOptions is a subclass of PipelineOptions that provides standard configuration options common to many pipeline runners, such as the runner type (DirectRunner, DataflowRunner, etc.) and other common settings.
+
+Key Properties
+runner: Specifies the runner to use, such as DirectRunner or DataflowRunner.
+project: (For DataflowRunner) Specifies the Google Cloud project.
+temp_location: (For DataflowRunner) Specifies the location for temporary files.
+
+from apache_beam.io.gcp.bigquery import BigQuerySource
+from apache_beam.io import ReadFromBigQuery
+
+The BigQuerySource class from apache_beam.io.gcp.bigquery was used in earlier versions of Apache Beam to read data from Google BigQuery tables. However, in more recent versions of Apache Beam, this class has been deprecated and replaced with newer methods for handling BigQuery data.
+
+For current Apache Beam versions, you should use the ReadFromBigQuery transform from apache_beam.io.gcp.bigquery to read data from BigQuery.
+
+The Apache Beam pipeline script performs the following operations:
+
+1. Reads data from a BigQuery table.
+2. Writes the data to a PostgreSQL database.
+
+PCollection
+---------------------------------------------------
+In Apache Beam, a PCollection (short for "Parallel Collection") is a core abstraction representing a distributed collection of data elements. It serves as the primary data structure that Beam transforms operate on and is fundamental to building data processing pipelines.
+
+Key Characteristics of PCollection
+Distributed Data: PCollection represents data that can be distributed across multiple workers in a distributed computing environment, such as Google Cloud Dataflow, Apache Spark, or Apache Flink.
+
+Immutable: Once created, a PCollection is immutable. Transformations applied to a PCollection produce new PCollections, preserving the original data structure.
+
+Lazy Evaluation: PCollections support lazy evaluation, meaning that data is not processed until an action (such as writing to a file or a database) is executed. This allows for optimizations and ensures that transformations are applied in a data-parallel manner.
+
+Unbounded and Bounded: PCollection can represent both bounded (finite) data, such as files or database tables, and unbounded (infinite) data, such as streaming data from a real-time source.
+
+PCollection as a special kind of list that is designed to handle large amounts of data across many computers or servers.
+
+Distributed List: A PCollection is essentially a list, but it’s spread out across multiple machines. Each machine handles a part of the list.
+
+Immutable: Once you create a PCollection, you can’t change it directly. If you want to transform it (like sorting or filtering), you create a new PCollection based on the original.
+
+Transformations: You apply operations (like map, filter, or group) to a PCollection to create new PCollections. For example, if you want to convert every name in a list to uppercase, you create a new PCollection where all names are in uppercase.
+
+DoFn
+
+DoFn (short for "Do Function") is a central concept in Apache Beam used to define custom processing logic for data within a pipeline.
+
+DoFn is a class in Apache Beam that allows you to specify how to process individual elements of a PCollection. It provides a way to implement custom processing logic.
+
+The purpose of DoFn is to encapsulate the logic for transforming data. This allows you to create complex data processing pipelines by defining how each element in a collection should be processed.
+
+Components of a DoFn
+
+Setup:
+
+Method: setup(self)
+Purpose: This method is called once before any processing begins. It's used to perform any necessary setup or initialization, such as opening database connections or loading configuration.
+Process:
+
+Method: process(self, element)
+Purpose: This is the core method where you define the actual processing logic for each element of the PCollection. You can transform the element and yield one or more results.
+Teardown:
+
+Method: teardown(self)
+Purpose: This method is called once after all elements have been processed. It is used to perform any necessary cleanup, such as closing database connections or releasing resources.
+
+In Apache Beam, the ParDo transform is used to apply a custom DoFn (short for "Do Function") to each element of a PCollection. The name ParDo stands for "Parallel Do," emphasizing that the operation is performed in parallel across multiple workers.
+
+What ParDo Does
+Apply a Function: ParDo applies a custom-defined function (the DoFn) to each element of a PCollection.
+Transform Elements: It allows you to perform arbitrary transformations on the elements, such as mapping, filtering, or enriching the data.
+Parallel Execution: The operation is executed in parallel across distributed workers, making it suitable for large-scale data processing.
+
+self.cursor.execute
+
+The process method is called for each element in the PCollection. It executes an SQL INSERT statement to add data to the PostgreSQL table sampletable. Each element is expected to be a dictionary with keys Name and ID. The conn.commit() call ensures that each insertion is committed to the database.
+
+The psycopg2 library is a popular PostgreSQL adapter for Python, which allows you to interact with PostgreSQL databases.
+
+
+beam.Pipeline: This initializes a Beam pipeline. The pipeline_options parameter is used to configure the pipeline (e.g., setting the runner to DataflowRunner or DirectRunner).
+
+
+p: Represents the pipeline object created by beam.Pipeline.
+| 'ReadFromBigQuery' >>: This is a transform operation. The | operator is used to apply a transformation to the PCollection.
+ReadFromBigQuery: This is a built-in Apache Beam transform for reading data from BigQuery. It requires a SQL query (bq_query) to fetch data from a BigQuery table.
+query=bq_query: This parameter specifies the SQL query to execute in BigQuery.
+use_standard_sql=True: Indicates that the SQL query uses BigQuery's Standard SQL syntax
+
+
+The result of this operation is a PCollection named rows, which contains the data fetched from BigQuery.
